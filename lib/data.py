@@ -30,7 +30,10 @@ def mmap_bvecs(fname):
 def getBasedir(s):
     paths = {
         "bigann": "/datasets01/simsearch/041218/bigann",
-        "deep1b": "/datasets01/simsearch/041218/deep1b"
+        "deep1b": "/datasets01/simsearch/041218/deep1b",
+        "sift1m": "/ai/base/sift1m",
+        "deep1m": "/ai/base/deep1m",
+        "labelme22k": "/ai/base/labelme22k"
     }
 
     return paths[s]
@@ -84,9 +87,30 @@ def load_bigann(device, size = 10 ** 6, test=True, qsize=10 ** 5):
 
     return xt, xb, xq, gt
 
+def load_sift1m(*_, **__):
+    basedir = getBasedir("sift1m")
+
+    # 10^5
+    xt = mmap_fvecs(join(basedir, 'sift_learn.fvecs'))
+    # 10^6
+    xb = mmap_fvecs(join(basedir, 'sift_base.fvecs'))
+    # 10^4
+    xq = mmap_fvecs(join(basedir, 'sift_query.bvecs'))
+    gt = ivecs_read(join(basedir, 'sift_groundtruth.ivecs'))
+
+    xb, xq, xt = sanitize(xb), sanitize(xq), sanitize(xt)
+
+    return xt, xb, xq, gt
+
 
 def load_dataset(name, device, size=10**6, test=True):
     if name == "bigann":
         return load_bigann(device, size, test)
     elif name == "deep1b":
         return load_deep1b(device, size, test)
+    elif name == "sift1m":
+        return load_sift1m()
+    elif name == "deep1m":
+        return load_deep1m()
+    elif name == "labelme22k":
+        return load_labelme22k()
