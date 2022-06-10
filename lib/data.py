@@ -31,9 +31,9 @@ def getBasedir(s):
     paths = {
         "bigann": "/datasets01/simsearch/041218/bigann",
         "deep1b": "/datasets01/simsearch/041218/deep1b",
-        "sift1m": "/ai/base/sift1m",
-        "deep1m": "/ai/base/deep1m",
-        "labelme22k": "/ai/base/labelme22k"
+        "sift1m": "/ai/base/data/sift1m",
+        "deep1m": "/ai/base/data/deep1m",
+        "labelme22k": "/ai/base/data/labelme22k"
     }
 
     return paths[s]
@@ -95,8 +95,42 @@ def load_sift1m(*_, **__):
     # 10^6
     xb = mmap_fvecs(join(basedir, 'sift_base.fvecs'))
     # 10^4
-    xq = mmap_fvecs(join(basedir, 'sift_query.bvecs'))
+    xq = mmap_fvecs(join(basedir, 'sift_query.fvecs'))
     gt = ivecs_read(join(basedir, 'sift_groundtruth.ivecs'))
+
+    xb, xq, xt = sanitize(xb), sanitize(xq), sanitize(xt)
+
+    return xt, xb, xq, gt
+
+
+def load_deep1m(device, *_, **__):
+    basedir = getBasedir("deep1m")
+
+    # 10^5
+    xt = np.load(join(basedir, 'train.npy'))
+    # 10^6
+    xb = np.load(join(basedir, 'base.npy'))
+    # 10^4
+    xq = np.load(join(basedir, 'query.npy'))
+
+    gt = get_nearestneighbors(xq, xb, 100, device)
+
+    xb, xq, xt = sanitize(xb), sanitize(xq), sanitize(xt)
+
+    return xt, xb, xq, gt
+
+
+def load_labelme22k(device, *_, **__):
+    basedir = getBasedir("labelme22k")
+
+    # 10^5
+    xt = np.load(join(basedir, 'train.npy')).astype(np.float32)
+    # 10^6
+    xb = np.load(join(basedir, 'base.npy')).astype(np.float32)
+    # 10^4
+    xq = np.load(join(basedir, 'query.npy')).astype(np.float32)
+
+    gt = get_nearestneighbors(xq, xb, 100, device)
 
     xb, xq, xt = sanitize(xb), sanitize(xq), sanitize(xt)
 
@@ -111,6 +145,6 @@ def load_dataset(name, device, size=10**6, test=True):
     elif name == "sift1m":
         return load_sift1m()
     elif name == "deep1m":
-        return load_deep1m()
+        return load_deep1m(device)
     elif name == "labelme22k":
-        return load_labelme22k()
+        return load_labelme22k(device)

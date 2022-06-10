@@ -135,9 +135,10 @@ def evaluate(net, xq, xb, gt, quantizers, best_key, device=None,
 
 class ValidationFunction:
 
-    def __init__(self, xq, xb, gt, checkpoint_dir, validation_key,
+    def __init__(self, xt, xq, xb, gt, checkpoint_dir, validation_key,
                  quantizers=[]):
         assert type(quantizers) == list
+        self.xt = xt
         self.xq = xq
         self.xb = xb
         self.gt = gt
@@ -154,7 +155,7 @@ class ValidationFunction:
         print("Valiation at epoch %d" % epoch)
         # also store current state of network + arguments
         res, score = evaluate(net, self.xq, self.xb, self.gt,
-                              self.quantizers, self.best_key)
+                              self.quantizers, self.best_key, trainset=self.xt[:10000])
         all_logs[-1]['val'] = res
         if self.checkpoint_dir:
             fname = join(self.checkpoint_dir, "checkpoint.pth")

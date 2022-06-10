@@ -275,7 +275,7 @@ if __name__ == '__main__':
 
     net.to(args.device)
 
-    val = ValidationFunction(xq, xb, gt, args.checkpoint_dir,
+    val = ValidationFunction(xt, xq, xb, gt, args.checkpoint_dir,
                              validation_key=args.save_best_criterion,
                              quantizers=args.validation_quantizers)
 

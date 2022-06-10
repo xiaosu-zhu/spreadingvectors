@@ -27,7 +27,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--candidates", type=int, default=10)
     parser.add_argument("--ckpt-path", type=str, required=True)
-    parser.add_argument("--database", choices=["bigann", "deep1b"])
+    parser.add_argument("--database", choices=["bigann", "deep1b", "sift1m", "deep1m", "labelme22k"])
     parser.add_argument("--device", choices=["cpu", "cuda", "auto"],
                         default="auto")
     parser.add_argument("--gpu", action='store_true', default=False)
